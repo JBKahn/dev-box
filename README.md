@@ -7,7 +7,7 @@ It's main use is to allow me to stop developing on my local machine and have a t
 
 1. Install [Virtualbox](https://www.virtualbox.org/) and [Vagrant](https://www.vagrantup.com/).
 2. Clone this directory and cd into it.
-3. Run `vagrant up`
+3. Run `vagrant up` (takes about 30-40 minutes to run)
 4. Run `./add_host.sh` (This forwards the ports for my webapps which are running on the box).
 
 ### SSH into the machine:
