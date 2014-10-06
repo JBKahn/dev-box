@@ -1,7 +1,7 @@
 ---
 - name: add 10.0.0.200 orlywaldman.dev-local.com /etc/hosts
   lineinfile:
-    line: "10.0.0.200 {{ item.subdomain }}.dev-local.conf"
+    line: "10.0.0.200 {{ item.subdomain }}.dev-local.com"
     dest: /etc/hosts
   sudo: yes
   with_items: nginx_confs
