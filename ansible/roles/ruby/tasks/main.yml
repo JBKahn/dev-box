@@ -1,0 +1,23 @@
+---
+# tasks file for ruby
+
+- name: remove ruby
+  apt:
+    name: ruby
+    state: absent
+  sudo: yes
+  tags: rub
+
+- name: download rvm installer
+  get_url:
+    url: https://get.rvm.io
+    dest: /tmp/rvm-install.sh
+    owner: vagrant
+    group: vagrant
+  sudo: yes
+  tags: ruby
+
+- name: install rvm with ruby
+  command: bash /tmp/rvm-install.sh stable --ruby
+  sudo: yes
+  tags: ruby

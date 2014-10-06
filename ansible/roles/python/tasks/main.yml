@@ -1,0 +1,59 @@
+---
+# tasks file for python
+
+- name: install python-dev
+  apt:
+    name: python-dev
+    state: present
+  sudo: yes
+  tags:
+    - python
+    - packages
+
+- name: download pip installer
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp
+  sudo: yes
+  tags:
+    - python
+    - packages
+
+- name: install pip
+  command: "{{ python_bin }} /tmp/get-pip.py"
+  sudo: yes
+  tags:
+    - python
+    - packages
+
+- name: ensure ~/.pip/ directory exists
+  file:
+    path: ~/.pip
+    state: directory
+  tags:
+    - python
+    - packages
+
+- name: ensure virtualenv root directory exists
+  file:
+    path: "{{ virtualenv_root }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+  sudo: yes
+  tags:
+    - python
+    - packages
+
+- name: install global python packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - virtualenv
+    - virtualenvwrapper
+    - ansible
+  sudo: yes
+  tags:
+    - python
+    - packages

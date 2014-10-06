@@ -1,0 +1,141 @@
+#!/bin/sh
+
+############### How to install ###############
+# If you already have a repo, put the file in
+# .git/hooks at the root of your repo:
+#
+#   .git/hooks/pre-commit
+#
+# If you want this hook to be included with
+# all new repos, create a directory somewhere
+# and put this inside like so:
+#
+#   ~/your_directory_here/hooks/pre-commit
+#
+# Add the following to your ~/.gitconfig:
+#
+#   [init]
+#       templatedir = ~/your_directory_here
+#
+# Then when you create a new repo via
+# `git init` it will copy over the pre-commit
+############### How to install ###############
+
+# Allows for colors and such
+export TERM=xterm-256color
+
+
+FILES="git diff --cached --name-only --diff-filter=ACM"
+ROOT=$(git rev-parse --show-toplevel)
+RETVAL=0
+
+PYTHON_FILES=$($FILES | grep -E ".py$")
+# This is because flake8's --exclude doesn't seem to work properly. Exclude via grep.
+PYTHON_FILES_WITHOUT_MIGRATIONS=$($FILES | grep -E ".py$" | grep -v "migrations/")
+JS_FILES=$($FILES | grep -E ".js$" | grep -v "dist" | grep -v "/build/")
+COFFEE_FILES=$($FILES | grep -E ".coffee$" | grep -v "dist" | grep -v "/build/")
+
+check_duplicates() {
+    # Find all the files in the the project with a path like `.../migrations/(4 digits)...py`
+    # Then it chops off everything after the last 4 digits, sorts and looks for unique counts
+    # of every line i.e. `1   app1/migrations/0003`.
+    # Then it greps for the lines which have exactly 1 copy of any migration path and number and removes them.
+    # If anything else remains, it's a duplicate migration and we count the remaining items.
+    dupes=$(find $ROOT -regex ".+migrations.[0-9][0-9][0-9][0-9].+py" \
+        | egrep -o '(.+migrations/[0-9]{4})' \
+        | sort | uniq -c | egrep -v " *1 .+")
+    dupe_count=$(echo $dupes | grep -vE "^$" | wc -l)
+    if [ $dupe_count -gt 0 ]; then
+        printf "\033[31mDuplicate migration detected:\n\033[0m"
+        printf "\033[33m$dupes\n\033[0m"
+        return 1;
+    fi
+    return $RETVAL || 0;
+}
+
+if [ -n "$PYTHON_FILES" ]; then
+
+    flake8=$(which flake8)
+    has_flake8_print=$(flake8 --version | grep flake8-print | wc -l)
+    has_flake8_debugger=$(flake8 --version | grep flake8-debugger | wc -l)
+
+    if [ -z "$flake8" ] || [ $has_flake8_print -lt 1 ] || [ $has_flake8_debugger -lt 1 ]; then
+        printf "\033[31mYou must install flake8 to check for python violations; sudo pip install flake8; sudo pip install flake8-print; sudo pip install flake8-debugger;\n\033[0m"
+        RETVAL=1
+    else
+        printf "\033[32mChecking python files for flake8 violations\n\033[0m"
+
+        for file in ${PYTHON_FILES_WITHOUT_MIGRATIONS}; do
+            FLAKE8_ERRORS=$(git show :${file} | flake8 --ignore=E501 - | sed -e 's/^stdin\:/line /g')
+
+            print_allowed=$(echo $file | grep -E "(management/commands|manage.py|/scripts|settings.py)" | wc -l)
+
+            if [ "$print_allowed" -gt 0 ]; then
+                FLAKE8_ERRORS=$(echo "$FLAKE8_ERRORS" | grep -v "print statement")
+            fi
+
+            if [ "$FLAKE8_ERRORS" != "" ]; then
+                printf "\033[33mFlake8 errors detected in $file\n\033[0m"
+                printf "\033[31m$FLAKE8_ERRORS\n\033[0m"
+                RETVAL=1
+            fi
+        done
+    fi
+
+    # Check for duplicate migrations
+    printf "\033[32mChecking Python files for duplicate migrations (legacy duplicates ignored)\n\033[0m"
+    check_duplicates
+    RETVAL=$?
+fi
+
+if [ -n "$JS_FILES" ]; then
+
+    jshint=$(which jshint)
+    node=$(which node)
+
+    if [ -z "$jshint" ] || [ -z "$node" ]; then
+        printf "\033[31mYou must install jshint to check for javascript violations; sudo npm install -g jshint\n\033[0m"
+        RETVAL=1
+    else
+        printf "\033[32mChecking javascript files for linting errors\n\033[0m"
+
+        for file in ${JS_FILES}; do
+            result=$(git show :${file} | jshint - | sed -e 's/^stdin\: line/line/g')
+
+            if [ "$result" != "" ]; then
+                printf "\033[33mJSHint errors detected in $file\n\033[0m"
+                printf "\033[31m$result\n\033[0m"
+                RETVAL=1
+            fi
+        done
+    fi
+fi
+
+if [ -n "$COFFEE_FILES" ]; then
+
+    coffee_jshint=$(which coffee-jshint)
+    node=$(which node)
+
+    if [ -z "$coffee_jshint" ] || [ -z "$node" ]; then
+        printf "\033[31mYou must install coffee-jshint to check for coffeescript violations; sudo npm install -g coffee-jshint\n\033[0m"
+        RETVAL=1
+    else
+        printf "\033[32mChecking coffeescript files for linting errors\n\033[0m"
+
+        for file in ${COFFEE_FILES}; do
+            result=$(coffee-jshint -o browser --globals describe,it,angular,define,mixpanel,_,$,confirm,key  ${file} | tail -n +3 | sed -e 's/^/line /g')
+
+            if [ "$result" != "" ]; then
+                printf "\033[33mCoffee-JSHint errors detected in $file\n\033[0m"
+                printf "\033[31m$result\n\033[0m"
+                RETVAL=1
+            fi
+        done
+    fi
+fi
+
+if [ $RETVAL -eq 0 ]; then
+    printf "\033[32mNo errors found!\n\033[0m"
+fi
+
+exit $RETVAL

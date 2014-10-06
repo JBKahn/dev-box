@@ -1,0 +1,3 @@
+---
+# vars file for postgres
+postgresql_version: 9.3

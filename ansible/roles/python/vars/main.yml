@@ -1,0 +1,7 @@
+---
+# vars file for python
+
+user: vagrant
+home: /home/{{ user }}
+python_bin: python2.7
+python_version: 'Python 2.7.8'

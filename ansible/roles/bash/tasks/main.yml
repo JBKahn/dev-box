@@ -1,0 +1,34 @@
+---
+# tasks file for bash
+
+- name: copy .bash_profile
+  template:
+    src: .bash_profile
+    dest: "{{ user_home }}/.bash_profile"
+  tags: bash
+
+- name: copy .bashrc
+  template:
+    src: .bashrc
+    dest: "{{ user_home }}/.bashrc"
+  tags: bash
+
+- name: ensure .login_message file is absent
+  file:
+    name: ~/.login_message
+    state: absent
+  tags: bash
+
+- name: copy message of the day
+  template:
+    src: motd
+    dest: "/etc/motd"
+  tags: bash
+  sudo: yes
+
+- name: install bash-completion
+  apt:
+    name: bash-completion
+    state: present
+  sudo: yes
+  tags: bash

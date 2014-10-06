@@ -1,0 +1,11 @@
+---
+# tasks file for network
+
+- name: add 127.0.0.1 to /etc/hosts
+  lineinfile:
+    regexp: '^127\.0\.0\.1'
+    line: '127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4 *.dev-local.com vagrant'
+    dest: /etc/hosts
+  sudo: yes
+  tags: network
+

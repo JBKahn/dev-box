@@ -1,0 +1,59 @@
+---
+# tasks file for dev-repos
+
+- name: checkout python repos
+  git:
+    repo: "git@github.com:JBKahn/{{ item.repo }}.git"
+    dest: "{{ src_root }}/{{ item.dest }}"
+    force: no
+    update: "{{ update_repos }}"
+    accept_hostkey: yes
+  with_items: python_repos
+  tags: dev-repos
+
+- name: checkout other repos
+  git:
+    repo: "git@github.com:JBKahn/{{ item.repo }}.git"
+    dest: "{{ src_root }}/{{ item.dest }}"
+    force: no
+    update: "{{ update_repos }}"
+    accept_hostkey: yes
+  with_items: other_repos
+  tags: dev-repos
+
+- name: install python application python requirements
+  pip:
+    requirements: "{{ src_root }}/{{ item.dest }}/requirements.txt"
+    virtualenv: "{{ virtualenv_root }}/{{ item.dest }}"
+  with_items: python_repos
+  tags: dev-repos
+
+- name: set virtualenv project directories for python-projects
+  template:
+    src: .project.j2
+    dest: "{{ virtualenv_root }}/{{ item.dest }}/.project"
+  with_items: python_repos
+  tags: dev-repos
+
+- name: setup nginx configuration files from template
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_root }}/{{ item.subdomain }}.dev-local.conf"
+  sudo: yes
+  with_items: nginx_confs
+  tags: dev-repos
+  notify: restart nginx
+
+- name: copy jshint configuration file into src root
+  copy:
+    src: .jshintrc
+    dest: "{{ src_root }}"
+  tags: dev-repos
+
+- name: copy git pre-commit hook into python repo .git/hooks directories
+  copy:
+    src: pre-commit
+    dest: "{{ src_root }}/{{ item.dest }}/.git/hooks"
+    mode: 0775
+  with_items: python_repos
+  tags: dev-repos

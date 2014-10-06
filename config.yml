@@ -1,0 +1,9 @@
+---
+# Amount of memory for the VM (in MB)
+memory: 2048
+
+# Number of cps for the VM
+cpus: 4
+
+# Enable / disable NFS for the synced vagrant folder
+nfs: true

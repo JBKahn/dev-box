@@ -1,0 +1,27 @@
+---
+- name: a playbook to sandbox development VM
+  hosts: vagrant
+  remote_user: vagrant
+  vars:
+    user_home: /home/vagrant
+    src_root: /vagrant/src
+    virtualenv_root: /data/virtualenv
+  roles:
+    - python
+    - ruby
+    - bash
+    - network
+    - mysql
+    - postgres
+    - nginx
+    - nodejs
+    - imagemagick
+    - misc-tools
+    - dev-repos
+
+# Uncomment when you can provide a password, otherwise doees not work due to lack of ssh password
+#- name: a play that runs entirely on the ansible host
+#  hosts: local
+#  connection: local
+#  roles:
+#    - host_file

@@ -1,0 +1,43 @@
+---
+# tasks file for nginx
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+  sudo: yes
+  tags: nginx
+
+- name: remove default site configurations
+  file:
+    name: "/etc/nginx/conf.d/{{ item }}.conf"
+    state: absent
+  sudo: yes
+  tags: nginx
+  with_items:
+    - default
+    - ssl
+    - virtual
+
+#- name: link sites-enabled to conf.d/
+#  file:
+#    src: /etc/nginx/conf.d
+#    dest: /etc/nginx/sites-enabled
+#    state: link
+#  sudo: yes
+#  tags: nginx
+
+- name: ensure nginx log directory exists
+  file:
+    path: /data/log/web/
+    state: directory
+  sudo: yes
+  tags: nginx
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  sudo: yes
+  tags: nginx

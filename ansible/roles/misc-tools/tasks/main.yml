@@ -1,0 +1,11 @@
+---
+# tasks file for development-tools
+
+- name: install development tools
+  apt:
+    name: "{{ item }}"
+    state: present
+  sudo: yes
+  with_items:
+    - screen
+    - vim

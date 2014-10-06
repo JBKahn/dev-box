@@ -1,0 +1,9 @@
+---
+# tasks file for imagemagick
+
+- name: install imagemagick
+  apt:
+    name: imagemagick
+    state: present
+  tags: imagemagick
+  sudo: yes

@@ -1,0 +1,15 @@
+---
+- name: Installing PosgreSQL
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - postgresql-{{postgresql_version}}
+    - postgresql-contrib-{{postgresql_version}}
+    - python-psycopg2
+  sudo: yes
+  tags: postgresql
+
+- name: Make sure its running
+  service: name=postgresql state=started enabled=yes
+  tags: postgresql

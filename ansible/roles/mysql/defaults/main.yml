@@ -1,0 +1,18 @@
+---
+# defaults file for mysql
+
+mysql_root_password: "root"
+
+# 'localhost' needs to be the last item for idempotency, see
+# http://ansible.cc/docs/modules.html#mysql-user
+mysql_hosts:
+  - "{{ ansible_hostname }}"
+  - 127.0.0.1
+  - ::1
+  - localhost
+
+users:
+  - user: root
+    home: /root
+  - user: vagrant
+    home: /home/vagrant

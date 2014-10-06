@@ -1,0 +1,19 @@
+---
+# defaults file for dev-repos
+
+update_repos: no
+nginx_conf_root: /etc/nginx/conf.d
+
+nginx_confs:
+  - { name: orlywaldman, port: 8004, subdomain: orlywaldman }
+
+python_repos:
+  - { repo: Orly-Django-Site, dest: orly }
+  - { repo: delta-force-sprint-name-generator, dest: delta-force-sprint-name-generator }
+  - { repo: bandcamp-dl, dest: bandcamp-dl }
+  - { repo: flake8-print, dest: flake8-print }
+  - { repo: flake8-debugger, dest: flake8-debugger }
+
+other_repos:
+  - { repo: Blog, dest: blog }
+  - { repo: JBKahn.github.io, dest: website }
