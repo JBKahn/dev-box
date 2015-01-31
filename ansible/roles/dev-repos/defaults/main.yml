@@ -17,3 +17,9 @@ python_repos:
 other_repos:
   - { repo: Blog, dest: blog }
   - { repo: JBKahn.github.io, dest: website }
+
+postgres_databases:
+  - { repo: orlywald, name: orlywald, owner: orlywald }
+
+postgres_users:
+  - { repo: orlywald, name: orlywald, password: orlywald }

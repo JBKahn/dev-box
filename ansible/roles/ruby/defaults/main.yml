@@ -1,2 +1,5 @@
 ---
 # defaults file for ruby
+
+ruby_version: 2.1.2
+rvm1_gpg_keys: 'D39DC0E3'

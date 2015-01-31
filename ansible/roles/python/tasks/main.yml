@@ -53,6 +53,7 @@
     - virtualenv
     - virtualenvwrapper
     - ansible
+    - ipython
   sudo: yes
   tags:
     - python

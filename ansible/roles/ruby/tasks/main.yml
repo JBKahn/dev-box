@@ -8,6 +8,9 @@
   sudo: yes
   tags: rub
 
+- name: Import GPG keys for rvm
+  command: 'gpg --keyserver hkp://keys.gnupg.net --recv-keys {{ rvm1_gpg_keys }}'
+
 - name: download rvm installer
   get_url:
     url: https://get.rvm.io
@@ -17,7 +20,10 @@
   sudo: yes
   tags: ruby
 
-- name: install rvm with ruby
-  command: bash /tmp/rvm-install.sh stable --ruby
-  sudo: yes
+- name: install rvm
+  command: bash /tmp/rvm-install.sh stable creates=~/.rvm/installed.at
+  tags: ruby
+
+- name: install ruby with rvm
+  command: rvm install ruby-{{ruby_version}} --binary --default creates=~/.rvm/rubies/ruby-{{ruby_version}}
   tags: ruby
