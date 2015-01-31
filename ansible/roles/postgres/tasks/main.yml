@@ -1,4 +1,12 @@
 ---
+
+- name: create postgres user
+  user:
+    name: "{{ postgres_admin_user }}"
+    password: "{{ postgres_admin_password }}"
+  sudo: yes
+  tags: postgres
+
 - name: Installing PosgreSQL
   apt:
     name: "{{ item }}"
@@ -8,8 +16,30 @@
     - postgresql-contrib-{{postgresql_version}}
     - python-psycopg2
   sudo: yes
-  tags: postgresql
+  tags: postgres
+
+- name: ensure postgres data directory exists
+  file:
+    path: "{{ postgres_data_directory }}"
+    state: directory
+  sudo: yes
+  tags: postgres
+
+- name: configure pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgres_data_directory }}/pg_hba.conf"
+    owner: "{{ postgres_admin_user }}"
+    group: "{{ postgres_admin_user }}"
+    mode: 0640
+  notify: restart postgres
+  sudo: yes
+  tags: postgres
 
 - name: Make sure its running
-  service: name=postgresql state=started enabled=yes
-  tags: postgresql
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+  sudo: yes
+  tags: postgres

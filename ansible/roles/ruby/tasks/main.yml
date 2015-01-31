@@ -25,5 +25,5 @@
   tags: ruby
 
 - name: install ruby with rvm
-  command: rvm install ruby-{{ruby_version}} --binary --default creates=~/.rvm/rubies/ruby-{{ruby_version}}
+  command: /home/vagrant/.rvm/bin/rvm install ruby-{{ruby_version}} --default creates=~/.rvm/rubies/ruby-{{ruby_version}}
   tags: ruby

@@ -35,6 +35,27 @@
   with_items: python_repos
   tags: dev-repos
 
+- name: create postgres users
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    role_attr_flags: CREATEDB
+    state: present
+  with_items: postgres_users
+  sudo_user: postgres
+  sudo: yes
+  tags: dev-repos
+
+- name: create postgres databases
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner }}"
+    state: present
+  with_items: postgres_databases
+  sudo_user: postgres
+  sudo: yes
+  tags: dev-repos
+
 - name: setup nginx configuration files from template
   template:
     src: nginx.conf.j2

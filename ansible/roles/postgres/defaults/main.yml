@@ -1,2 +1,20 @@
 ---
 # defaults file for postgres
+
+postgres_admin_user: "postgres"
+postgres_admin_password: "dsdsndskpEnjhdDxNKheFqJBHZj3uAMKysrPByBeFz3z7f2dzyHjvre3ZzTKsPtfQ7h2BXdrY2y5OOaWffE4dyD7tsDHrfaDup5b79sX"
+postgres_data_directory: "/var/lib/pgsql/{{ postgresql_version }}/data"
+
+# Settings related to the pg_hba rules
+postgres_default_unix_auth_method: "trust"
+postgres_default_ipv4_auth_method: "md5"
+postgres_default_ipv6_auth_method: "md5"
+
+# Specify default rules for pg_hba.conf. Change them only if it is really necessary.
+postgres_pg_hba_default:
+  - { type: local, database: all, role: "{{ postgres_admin_user }}", address: "", method: "{{ postgres_default_unix_auth_method }}", comment: '"local" is for Unix domain socket connections only' }
+  - { type: host, database: all, role: all, address: "127.0.0.1/32", method: "{{ postgres_default_ipv4_auth_method }}", comment: 'IPv4 local connections:' }
+  - { type: host, database: all, role: all, address: "::1/128", method: "{{ postgres_default_ipv6_auth_method }}", comment: 'IPv6 local connections:' }
+
+# Specify custom rules for pg_hba.conf. Specify here all necessary pg_hba rules.
+postgres_pg_hba_custom: []
