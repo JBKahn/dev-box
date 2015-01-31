@@ -15,6 +15,12 @@
     - postgresql-{{postgresql_version}}
     - postgresql-contrib-{{postgresql_version}}
     - python-psycopg2
+    - libpq-dev
+  sudo: yes
+  tags: postgres
+
+- name: apt-get python-psycog2 build-dept
+  command: apt-get build-dep python-psycopg2
   sudo: yes
   tags: postgres
 

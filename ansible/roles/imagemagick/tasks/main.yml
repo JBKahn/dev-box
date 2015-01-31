@@ -7,3 +7,10 @@
     state: present
   tags: imagemagick
   sudo: yes
+
+- name: install libjpeg-dev
+  apt:
+    name: libjpeg-dev
+    state: present
+  tags: imagemagick
+  sudo: yes
